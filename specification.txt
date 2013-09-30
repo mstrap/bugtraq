@@ -1,0 +1,90 @@
+Git Bugtraq Configuration specification
+=======================================
+Version 0.1, 2013-09-30
+
+
+1. Introduction
+---------------
+
+Git commits are often related to specific issues (or bugs). The Git
+Bugtraq Configuration allows to associate a Git commit with a
+corresponding issue ID. Git clients may use this association to provide
+additional functionality, like displaying a hyperlink for issue IDs
+within a commit message which links to the appropriate issue tracker
+web page.
+
+The Git Bugtraq Configuration is similar to Subversion bugtraq
+properties[1].
+
+
+2. Configuration options
+------------------------
+
+* bugtraq.url (mandatory)
+
+specifies the URL of the bug tracking system. It must be properly URI
+encoded and it has to contain %BUGID%. %BUGID% will be replaced by the
+Git client with a concrete issue number.
+
+
+* bugtraq.logIdRegex (mandatory) and
+  bugtraq.logPrefilterRegex (optional)
+
+specify POSIX Extended Regular Expressions[2] which will be used to
+extract the issue	ID from a commit message.
+
+logPrefilterRegex is optional and will be used as a pre-filter to
+find expressions which contain bug IDs.
+
+logIdRegex will be used to extract the bare bug IDs from the commit
+message or from the result of logPrefilterRegex, if specified.
+
+Example: with logPrefilterRegex set to
+
+  [Ii]ssues?:?(\s*(,|and)?\s*#\d+)+
+
+and logIdRegex set to
+
+  (\d+)
+
+and having a commit message like
+
+  Issues #3, #4 and #5: Git Bugtraq Configuration options (see #12)
+
+logPrefilterRegex will pick "Issues #3, #4 and #5" and logIdRegex will
+pick "3", "4" and "5". If logPrefilterRegex would not be set,
+logIdRegex would pick "12" as well.
+
+
+3. Configuration files
+----------------------
+
+There are two places where the configuration options can be specified:
+
+* in the .gitbugtraq file in the repository root. This file is using
+  the default Git config file layout.
+
+* in $GIT_DIR/config
+
+Options specified in $GIT_DIR/config will override options from
+.gitbugtraq.
+
+An example content of .gitbugtraq (note, that '\' need to be escaped):
+
+  [bugtraq]
+    url = https://host/browse/SG-%BUGID%
+    logIdRegex = \\d+
+    logPrefilterRegex = SG-(\\d+)
+    
+Exactly the same lines could be added as an additional section to
+$GIT_DIR/config as well.
+
+
+References
+----------
+
+[1] http://tortoisesvn.net/docs/release/TortoiseSVN_en/
+    tsvn-dug-bugtracker.html
+
+[2] http://www.regular-expressions.info/
+

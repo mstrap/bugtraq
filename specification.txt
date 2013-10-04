@@ -36,11 +36,15 @@ Git client with a concrete issue ID.
 specify Perl Compatible Regular Expressions[3] which will be used to
 extract the issue ID from a commit message.
 
-logRegex must contain exactly one group, which represents the extracted
-BUGID. If there are optional logRegex1, logRegex2, ... present, the
-extracted results of logRegex is used as input for logRegex1, the
-result of logRegex1 is used as input of logRegex2 and so on. logRegex1
-... logRegexN must be consecutively numbered and will be applied in
+logRegex must contain exactly one matching group, which represents the
+extracted BUGID. There may be additional non-matching groups ('(?:').
+logRegex matches case-sensitive unless explicitly set to case-
+insensitive ('(?i)').
+
+If there are optional logRegex1, logRegex2, ... present, the extracted
+results of logRegex is used as input for logRegex1, the result of
+logRegex1 is used as input of logRegex2 and so on. logRegex1 ...
+logRegexN must be consecutively numbered and will be applied in
 numbering order. If any of logRegex ... logRegexN do not match, no
 BUGID will be extracted.
 

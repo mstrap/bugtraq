@@ -1,4 +1,3 @@
-[bugtraq]
+[bugtraq "jira"]
   url = https://host/jira/browse/SG-%BUGID%
-  logIdRegex = SG-(\\d+)
-  logPrefilterRegex = SG-(\\d+)
+  logRegex = SG-(\\d+)

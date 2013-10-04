@@ -1,0 +1,4 @@
+[bugtraq "fogbugz"]
+  url = https://host/?%BUGID%
+  logRegex = "(?i)(?:Bug[zs]?\\s*IDs?\\s*|Cases?)[#:; ]+((\\d+[ ,:;#]*)+)"
+  logRegex1 = \\d+

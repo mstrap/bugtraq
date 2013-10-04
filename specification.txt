@@ -33,7 +33,7 @@ Git client with a concrete issue ID.
 * bugtraq.<name>.logRegex (mandatory) and
   bugtraq.<name>.logRegex<N> (optional)
 
-specify Perl Regular Expressions[3] which will be used to
+specify Perl Compatible Regular Expressions[3] which will be used to
 extract the issue ID from a commit message.
 
 logRegex must contain exactly one group, which represents the extracted

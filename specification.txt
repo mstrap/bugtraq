@@ -1,6 +1,6 @@
 Git Bugtraq Configuration specification
 =======================================
-Version 0.2.1, 2013-10-03
+Version 0.2.2, 2013-10-04
 
 
 1. Introduction

@@ -33,7 +33,7 @@ Git client with a concrete issue ID.
 * bugtraq.<name>.logRegex (mandatory) and
   bugtraq.<name>.logRegex<N> (optional)
 
-specify POSIX Extended Regular Expressions[3] which will be used to
+specify Perl Regular Expressions[3] which will be used to
 extract the issue ID from a commit message.
 
 logRegex must contain exactly one group, which represents the extracted
@@ -118,5 +118,5 @@ References
 [2] https://gerrit-review.googlesource.com/Documentation/
     config-gerrit.html#_a_id_commentlink_a_section_commentlink
 
-[3] http://www.regular-expressions.info/
+[3] http://perldoc.perl.org/perlre.html
 

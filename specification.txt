@@ -107,7 +107,7 @@ An example content of .gitbugtraq (note, that '\' need to be escaped):
   [bugtraq "tracker"]
     url = https://host/browse/SG-%BUGID%
     logRegex = \\d+
-    logPrefilterRegex = SG-(\\d+)
+    logRegex1 = SG-(\\d+)
     
 Exactly the same lines could be added as an additional section to
 $GIT_DIR/config as well.

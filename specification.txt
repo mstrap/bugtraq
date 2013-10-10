@@ -63,6 +63,8 @@ and having a commit message like
 logRegex will pick "Issues #3, #4 and #5" and logRegex1 will pick "3", "
 4" and "5".
 
+Note: in Git-Config-like files, backslashes needs to be escaped (see
+section 5).
 
 * bugtraq.<name>.enabled (optional)
 

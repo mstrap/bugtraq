@@ -30,29 +30,29 @@ encoded and it has to contain %BUGID%. %BUGID% will be replaced by the
 Git client with a concrete issue ID.
 
 
-* bugtraq.<name>.logRegex (mandatory) and
-  bugtraq.<name>.logRegex<N> (optional)
+* bugtraq.<name>.logregex (mandatory) and
+  bugtraq.<name>.logregex<N> (optional)
 
 specify Perl Compatible Regular Expressions[3] which will be used to
 extract the issue ID from a commit message.
 
-logRegex must contain exactly one matching group, which represents the
+logregex must contain exactly one matching group, which represents the
 extracted BUGID. There may be additional non-matching groups ('(?:').
-logRegex matches case-sensitive unless explicitly set to case-
+logregex matches case-sensitive unless explicitly set to case-
 insensitive ('(?i)').
 
-If there are optional logRegex1, logRegex2, ... present, the extracted
-results of logRegex is used as input for logRegex1, the result of
-logRegex1 is used as input of logRegex2 and so on. logRegex1 ...
-logRegexN must be consecutively numbered and will be applied in
-numbering order. If any of logRegex ... logRegexN do not match, no
+If there are optional logregex1, logregex2, ... present, the extracted
+results of logregex is used as input for logregex1, the result of
+logregex1 is used as input of logregex2 and so on. logregex1 ...
+logregexN must be consecutively numbered and will be applied in
+numbering order. If any of logregex ... logregexN do not match, no
 BUGID will be extracted.
 
-Example: with logRegex set to
+Example: with logregex set to
 
   [Ii]ssues?:?(\s*(,|and)?\s*#\d+)+
 
-and logRegex1 set to
+and logregex1 set to
 
   (\d+)
 
@@ -60,7 +60,7 @@ and having a commit message like
 
   Issues #3, #4 and #5: Git Bugtraq Configuration options (see #12)
 
-logRegex will pick "Issues #3, #4 and #5" and logRegex1 will pick "3", "
+logregex will pick "Issues #3, #4 and #5" and logregex1 will pick "3", "
 4" and "5".
 
 Note: in Git-Config-like files, backslashes needs to be escaped (see
@@ -85,8 +85,8 @@ Configurations will be processed in order of appearance in the
 configuration files (section 4).
 
 When extracting issue IDs from a commit message, the client will
-stop processing further configurations once logRegex of the currently
-processed configuration matches, regardless whether logRegexN actually
+stop processing further configurations once logregex of the currently
+processed configuration matches, regardless whether logregexN actually
 match or not, i.e. regardless whether there will be actually a BUGID
 extracted or not.
 
@@ -108,27 +108,27 @@ An example content of .gitbugtraq (note, that '\' need to be escaped):
 
   [bugtraq "tracker"]
     url = https://host/browse/SG-%BUGID%
-    logRegex = \\d+
-    logRegex1 = SG-(\\d+)
+    logregex = \\d+
+    logregex1 = SG-(\\d+)
     
 Exactly the same lines could be added as an additional section to
 $GIT_DIR/config as well.
 
 
-5. logRegEx examples
+5. logregex examples
 --------------------
 
 * From messages like "Fix: #1" or "fixes:  #1, #2 and #3",
   the "1", "2" and "3" should be extracted.
 
-  logRegex =  "(?i)fix(?:es)?\\: ((\\s*(,|and)?\\s*#\\d+)+)"
-  logRegex1 = (\\d+) 
+  logregex =  "(?i)fix(?:es)?\\: ((\\s*(,|and)?\\s*#\\d+)+)"
+  logregex1 = (\\d+) 
 
 * From messages like "Bug: #1" or "Bug IDs: #1; #2; #3" or
   "Cases: #1, #2" the "1", "2" and "3" should be extracted.
 
-  logRegex = "(?i)(?:Bug[zs]?\\s*IDs?\\s*|Cases?)[#:; ]+((\\d+[ ,:;#]*)+)"
-  logRegex1 = \\d+
+  logregex = "(?i)(?:Bug[zs]?\\s*IDs?\\s*|Cases?)[#:; ]+((\\d+[ ,:;#]*)+)"
+  logregex1 = \\d+
   
 
 References

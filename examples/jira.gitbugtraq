@@ -3,4 +3,4 @@
 # (note that '\' need to be escaped).
 [bugtraq "jira"]
   url = https://host/jira/browse/SG-%BUGID%
-  logRegex = SG-(\\d+)
+  logregex = SG-(\\d+)

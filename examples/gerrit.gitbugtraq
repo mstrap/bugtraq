@@ -3,5 +3,5 @@
 # (note that '\' need to be escaped and strings with '#' need to be quoted).
 [bugtraq "gerrit"]
   url = "http://yourhost.com/r/#q,%BUGID%,n,z"
-  logRegex = "Change-Id:\\s*([A-Za-z0-9]*)"
+  logRegex = "Change-Id:\\s*([A-Za-z0-9]{40})"
   

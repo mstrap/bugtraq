@@ -1,0 +1,3 @@
+[bugtraq "github"]
+  url = https://github.com/mstrap/bugtraq/issues/%BUGID%
+  logRegex = "(?i)(?:(?:Issues?) ?[#]?(?:[ ,:;#]*(\\d+))*)"

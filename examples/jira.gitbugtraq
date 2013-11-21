@@ -2,5 +2,5 @@
 # It could instead be added as an additional section to $GIT_DIR/config.
 # (note that '\' need to be escaped).
 [bugtraq "jira"]
-  url = https://host/jira/browse/SG-%BUGID%
-  logRegex = SG-(\\d+)
+  https://jira.atlassian.com/browse/%BUGID%
+  logRegex = (JRA-\\d+)

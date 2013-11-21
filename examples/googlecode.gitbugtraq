@@ -1,0 +1,6 @@
+# An example content of .gitbugtraq to put in the repository root directory.
+# It could instead be added as an additional section to $GIT_DIR/config.
+# (note that '\' need to be escaped).
+[bugtraq "googlecode"]
+  url = http://code.google.com/p/yourproject/issues/detail?id=%BUGID%
+  logRegex = "[Ii]ssues?:?(\\s*(,|and)?\\s*#?\\d+)+\n(\\d+)"

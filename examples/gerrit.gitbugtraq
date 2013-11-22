@@ -2,6 +2,6 @@
 # It could instead be added as an additional section to $GIT_DIR/config.
 # (note that '\' need to be escaped and strings with '#' need to be quoted).
 [bugtraq "gerrit"]
-  url = "http://yourhost.com/r/#q,%BUGID%,n,z"
-  logRegex = "Change-Id:\\s*([A-Za-z0-9]{41})"
+  url = "https://git.eclipse.org/r/#q,%BUGID%,n,z"
+  logRegex = "Change-Id:\\s*(I[A-Fa-f0-9]{40})"
   

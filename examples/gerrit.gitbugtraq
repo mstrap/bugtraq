@@ -1,0 +1,7 @@
+# An example content of .gitbugtraq to put in the repository root directory.
+# It could instead be added as an additional section to $GIT_DIR/config.
+# (note that '\' need to be escaped and strings with '#' need to be quoted).
+[bugtraq "gerrit"]
+  url = "https://git.eclipse.org/r/#q,%BUGID%,n,z"
+  logRegex = "Change-Id:\\s*(I[A-Fa-f0-9]{40})"
+  

@@ -1,6 +1,6 @@
 Git Bugtraq Configuration specification
 =======================================
-Version 0.2.2, 2013-10-04
+Version 0.2.3, 2013-11-23
 
 
 1. Introduction
@@ -80,15 +80,16 @@ trackers or alternative configurations for the same issue tracker. In
 the latter case, probably only one of these configurations will be
 enabled.
 
-Every configuration uses its own namespace 'bugtraq.<name>'.
-Configurations will be processed in order of appearance in the
-configuration files (section 4).
+Every configuration uses its own namespace 'bugtraq.<name>'. For a
+single commit message, all configurations will be applied, possibly
+giving multiple issue links to different issue trackers for a single
+commit message.
 
-When extracting issue IDs from a commit message, the client will
-stop processing further configurations once logRegex of the currently
-processed configuration matches, regardless whether logRegexN actually
-match or not, i.e. regardless whether there will be actually a BUGID
-extracted or not.
+3.1 Handling of intersecting issues IDs
+
+If two issue IDs are intersecting (due to intersecting configurations),
+only the issue ID with the lower starting position will be displayed.
+The other issue ID will be ignored.
 
 
 4. Configuration files

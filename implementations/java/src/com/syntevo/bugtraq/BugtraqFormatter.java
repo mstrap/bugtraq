@@ -51,7 +51,9 @@ public final class BugtraqFormatter {
 		final SortedSet<IssueId> allIds = new TreeSet<IssueId>(new Comparator<IssueId>() {
 			@Override
 			public int compare(IssueId o1, IssueId o2) {
-				return Integer.compare(o1.id.getFrom(), o2.id.getFrom());
+				final int from1 = o1.id.getFrom();
+				final int from2 = o2.id.getFrom();
+				return from1 > from2 ? +1 : from1 < from2 ? -1 : 0;
 			}
 		});
 

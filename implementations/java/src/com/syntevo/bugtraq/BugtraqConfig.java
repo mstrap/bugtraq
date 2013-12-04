@@ -34,7 +34,10 @@ import java.util.*;
 
 import org.eclipse.jgit.errors.*;
 import org.eclipse.jgit.lib.*;
+import org.eclipse.jgit.revwalk.*;
 import org.eclipse.jgit.storage.file.*;
+import org.eclipse.jgit.treewalk.*;
+import org.eclipse.jgit.treewalk.filter.*;
 import org.jetbrains.annotations.*;
 
 public final class BugtraqConfig {
@@ -53,7 +56,7 @@ public final class BugtraqConfig {
 
 	@Nullable
 	public static BugtraqConfig read(@NotNull Repository repository) throws IOException, ConfigInvalidException {
-		final FileBasedConfig baseConfig = getBaseConfig(repository);
+		final Config baseConfig = getBaseConfig(repository);
 		final Set<String> allNames = new HashSet<String>();
 		final Config config = repository.getConfig();
 		allNames.addAll(config.getSubsections(BUGTRAQ));
@@ -117,17 +120,56 @@ public final class BugtraqConfig {
 	// Utils ==================================================================
 
 	@Nullable
-	private static FileBasedConfig getBaseConfig(Repository repository) throws IOException, ConfigInvalidException {
-		final File baseFile = new File(repository.getWorkTree(), DOT_GIT_BUGTRAQ);
-		final FileBasedConfig baseConfig;
-		if (baseFile.isFile()) {
-			baseConfig = new FileBasedConfig(baseFile, repository.getFS());
-			baseConfig.load();
+	private static Config getBaseConfig(Repository repository) throws IOException, ConfigInvalidException {
+		final Config baseConfig;
+		if (repository.isBare()) {
+			// read bugtraq config directly from the repository
+			String content = null;
+			RevWalk rw = new RevWalk(repository);
+			TreeWalk tw = new TreeWalk(repository);
+			tw.setFilter(PathFilterGroup.createFromStrings(DOT_GIT_BUGTRAQ));
+			try {
+				ObjectId headId = repository.getRef(Constants.HEAD).getTarget().getObjectId();
+				RevCommit commit = rw.parseCommit(headId);
+				RevTree tree = commit.getTree();
+				tw.reset(tree);
+				while (tw.next()) {
+					ObjectId entid = tw.getObjectId(0);
+					FileMode entmode = tw.getFileMode(0);
+					if (FileMode.REGULAR_FILE == entmode) {
+						ObjectLoader ldr = repository.open(entid, Constants.OBJ_BLOB);
+						content = new String(ldr.getCachedBytes(), commit.getEncoding());
+						break;
+					}
+				}
+			} finally {
+				rw.dispose();
+				tw.release();
+			}
+
+			if (content == null) {
+				// config not found
+				baseConfig = null;
+			}
+			else {
+				// parse the config
+				Config config = new Config();
+				config.fromText(content);
+				baseConfig = config;
+			}
 		}
 		else {
-			baseConfig = null;
+			// read bugtraq config from work tree
+			final File baseFile = new File(repository.getWorkTree(), DOT_GIT_BUGTRAQ);
+			if (baseFile.isFile()) {
+				FileBasedConfig fileConfig = new FileBasedConfig(baseFile, repository.getFS());
+				fileConfig.load();
+				baseConfig = fileConfig;
+			}
+			else {
+				baseConfig = null;
+			}
 		}
-
 		return baseConfig;
 	}
 

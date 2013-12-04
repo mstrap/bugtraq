@@ -34,7 +34,10 @@ import java.util.*;
 
 import org.eclipse.jgit.errors.*;
 import org.eclipse.jgit.lib.*;
+import org.eclipse.jgit.revwalk.*;
 import org.eclipse.jgit.storage.file.*;
+import org.eclipse.jgit.treewalk.*;
+import org.eclipse.jgit.treewalk.filter.*;
 import org.jetbrains.annotations.*;
 
 public final class BugtraqConfig {

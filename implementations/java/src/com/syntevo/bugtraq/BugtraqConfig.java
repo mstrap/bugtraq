@@ -51,6 +51,8 @@ public final class BugtraqConfig {
 	private static final String URL = "url";
 	private static final String ENABLED = "enabled";
 	private static final String LOG_REGEX = "logregex";
+	private static final String LOG_FILTERREGEX = "logfilterregex";
+	private static final String LOG_LINKREGEX = "loglinkregex";
 
 	// Static =================================================================
 
@@ -81,24 +83,35 @@ public final class BugtraqConfig {
 				continue;
 			}
 
-			final String logIdRegex = getString(name, LOG_REGEX, config, baseConfig);
-			if (logIdRegex == null) {
+			String idRegex = getString(name, LOG_REGEX, config, baseConfig);
+			if (idRegex == null) {
 				return null;
 			}
 
-			final List<String> logIdRegexs = new ArrayList<String>();
-			logIdRegexs.add(logIdRegex);
+			String filterRegex = getString(name, LOG_FILTERREGEX, config, baseConfig);
+			final String linkRegex = getString(name, LOG_LINKREGEX, config, baseConfig);
+			if (filterRegex == null && linkRegex == null) {
+				// Backwards compatibility with specification version < 0.3
+				final List<String> logIdRegexs = new ArrayList<String>();
+				for (int index = 1; index < Integer.MAX_VALUE; index++) {
+					final String logIdRegexN = getString(name, LOG_REGEX + index, config, baseConfig);
+					if (logIdRegexN == null) {
+						break;
+					}
 
-			for (int index = 1; index < Integer.MAX_VALUE; index++) {
-				final String logIdRegexN = getString(name, LOG_REGEX + index, config, baseConfig);
-				if (logIdRegexN == null) {
-					break;
+					logIdRegexs.add(logIdRegexN);
 				}
 
-				logIdRegexs.add(logIdRegexN);
+				if (logIdRegexs.size() > 1) {
+					throw new ConfigInvalidException("More than three " + LOG_REGEX + " entries found. This is not supported anymore since bugtraq version 0.3, use " + LOG_FILTERREGEX + " and " + LOG_LINKREGEX + " instead.");
+				}
+				else if (logIdRegexs.size() == 1) {
+					filterRegex = idRegex;
+					idRegex = logIdRegexs.get(0);
+				}
 			}
 
-			entries.add(new BugtraqEntry(url, logIdRegexs));
+			entries.add(new BugtraqEntry(url, idRegex, linkRegex, filterRegex));
 		}
 
 		if (entries.isEmpty()) {

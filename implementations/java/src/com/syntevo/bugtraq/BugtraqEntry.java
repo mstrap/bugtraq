@@ -42,9 +42,9 @@ final class BugtraqEntry {
 
 	// Setup ==================================================================
 
-	public BugtraqEntry(@NotNull String url, @NotNull List<String> logIdRegexs) throws BugtraqException {
+	public BugtraqEntry(@NotNull String url, @NotNull String logIdRegex, @Nullable String logLinkRegex, @Nullable String logFilterRegex) throws BugtraqException {
 		this.url = url;
-		this.parser = BugtraqParser.createInstance(logIdRegexs);
+		this.parser = BugtraqParser.createInstance(logIdRegex, logLinkRegex, logFilterRegex);
 	}
 
 	// Accessing ==============================================================

@@ -39,24 +39,24 @@ public class BugtraqFormatterTest extends TestCase {
 
 	// Accessing ==============================================================
 
-	public void testSimple() throws BugtraqException {
-		final BugtraqFormatter formatter = createFormatter(createEntry("https://jira.atlassian.com/browse/%BUGID%", "JRA-\\d+"));
+	public void testSimpleWithExtendedLink() throws BugtraqException {
+		final BugtraqFormatter formatter = createFormatter(createEntry("https://jira.atlassian.com/browse/JRA-%BUGID%", null, "JRA-\\d+", "\\d+"));
 		doTest(formatter, "JRA-7399: Email subject formatting", l("JRA-7399", "https://jira.atlassian.com/browse/JRA-7399"), t(": Email subject formatting"));
 		doTest(formatter, " JRA-7399, JRA-7398: Email subject formatting", t(" "), l("JRA-7399", "https://jira.atlassian.com/browse/JRA-7399"), t(", "), l("JRA-7398", "https://jira.atlassian.com/browse/JRA-7398"), t(": Email subject formatting"));
 		doTest(formatter, "Fixed JRA-7399", t("Fixed "), l("JRA-7399", "https://jira.atlassian.com/browse/JRA-7399"));
 	}
 
 	public void testTwoNonIntersectingConfigurations() throws BugtraqException {
-		final BugtraqFormatter formatter = createFormatter(createEntry("https://jira.atlassian.com/browse/%BUGID%", "JRA-\\d+"),
-		                                                   createEntry("https://issues.apache.org/jira/browse/%BUGID%", "VELOCITY-\\d+"));
+		final BugtraqFormatter formatter = createFormatter(createEntry("https://jira.atlassian.com/browse/%BUGID%", null, null, "JRA-\\d+"),
+		                                                   createEntry("https://issues.apache.org/jira/browse/%BUGID%", null, null, "VELOCITY-\\d+"));
 		doTest(formatter, "JRA-7399, VELOCITY-847: fix", l("JRA-7399", "https://jira.atlassian.com/browse/JRA-7399"), t(", "), l("VELOCITY-847", "https://issues.apache.org/jira/browse/VELOCITY-847"), t(": fix"));
 		doTest(formatter, " JRA-7399: fix/VELOCITY-847", t(" "), l("JRA-7399", "https://jira.atlassian.com/browse/JRA-7399"), t(": fix/"), l("VELOCITY-847", "https://issues.apache.org/jira/browse/VELOCITY-847"));
 		doTest(formatter, "JRA-7399VELOCITY-847", l("JRA-7399", "https://jira.atlassian.com/browse/JRA-7399"), l("VELOCITY-847", "https://issues.apache.org/jira/browse/VELOCITY-847"));
 	}
 
 	public void testTwoIntersectingConfigurations() throws BugtraqException {
-		final BugtraqFormatter formatter = createFormatter(createEntry("https://host1/%BUGID%", "A[AB]"),
-		                                                   createEntry("https://host2/%BUGID%", "BA[A]?"));
+		final BugtraqFormatter formatter = createFormatter(createEntry("https://host1/%BUGID%", null, null, "A[AB]"),
+		                                                   createEntry("https://host2/%BUGID%", null, null, "BA[A]?"));
 		doTest(formatter, "AA: fix", l("AA", "https://host1/AA"), t(": fix"));
 		doTest(formatter, "AB: fix", l("AB", "https://host1/AB"), t(": fix"));
 		doTest(formatter, "BA: fix", l("BA", "https://host2/BA"), t(": fix"));
@@ -77,8 +77,8 @@ public class BugtraqFormatterTest extends TestCase {
 		return new BugtraqFormatter(new BugtraqConfig(Arrays.asList(entries)));
 	}
 	
-	private BugtraqEntry createEntry(String url, String ... logRegexs) throws BugtraqException {
-		return new BugtraqEntry(url, Arrays.asList(logRegexs));
+	private BugtraqEntry createEntry(String url, @Nullable String filterRegex, @Nullable String linkRegex, @NotNull String idRegex) throws BugtraqException {
+		return new BugtraqEntry(url, idRegex, linkRegex, filterRegex);
 	}
 	
 	private Text t(String text) {

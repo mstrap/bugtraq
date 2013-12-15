@@ -59,10 +59,6 @@ public final class BugtraqFormatter {
 
 		for (BugtraqEntry entry : config.getEntries()) {
 			final List<BugtraqParserIssueId> ids = entry.getParser().parse(message);
-			if (ids == null) {
-				continue;
-			}
-
 			for (BugtraqParserIssueId id : ids) {
 				allIds.add(new IssueId(entry, id));
 			}

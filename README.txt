@@ -1,6 +1,6 @@
 Git Bugtraq Configuration specification
 =======================================
-Version 0.3, 2013-11-23
+Version 0.3, 2013-11-25
 
 
 1. Introduction
@@ -29,41 +29,56 @@ encoded and it has to contain %BUGID%. %BUGID% will be replaced by the
 Git client with a concrete issue ID.
 
 
-* bugtraq.logregex (mandatory) and
-  bugtraq.logregex<N> (optional)
+* bugtraq.logregex (mandatory),
+  bugtraq.loglinkregex (optional) and
+  bugtraq.logfilterregex (optional)
 
 specify Perl Compatible Regular Expressions[3] which will be used to
 extract the issue ID from a commit message.
 
-logregex must contain exactly one matching group, which represents the
-extracted BUGID. There may be additional non-matching groups ('(?:').
-logregex matches case-sensitive unless explicitly set to case-
-insensitive ('(?i)').
+logregex must contain exactly one matching group, which extracts
+BUGIDs.
 
-If there are optional logregex1, logregex2, ... present, the extracted
-results of logregex is used as input for logregex1, the result of
-logregex1 is used as input of logregex2 and so on. logregex1 ...
-logregexN must be consecutively numbered and will be applied in
-numbering order. If any of logregex ... logregexN do not match, no
-BUGID will be extracted.
+If present, loglinkregex will be applied before logregex. It must
+contain exactly one matching group, which extracts parts from the
+commit message that should show up as a link. logregex will then be
+applied to every such link to extract the actual BUGID (which is a part
+of the entire link). If loglinkregex is set, logregex must extract
+exactly one BUGID.
 
-Example: with logregex set to
+If present, logfilterregex will be applied before logregex (or
+loglinkregex, resp.). Is must contain exactly one matching group which
+extracts arbitrary parts of the commit message that will be used as
+input for logregex (or loglinkregex, resp.).
+
+Every of these regular expressions may contain additional non-matching
+groups ('(?:') and matches case-sensitive unless explicitly set to
+case-insensitive ('(?i)'). The overall extraction looks as follows:
+
+  commit message -> logfilterregex -> loglinkregex -> logregex -> BUGID
+
+Example: with logfilterregex set to
 
   [Ii]ssues?:?(\s*(,|and)?\s*#\d+)+
 
-and logregex1 set to
+loglinkregex set to
 
-  (\d+)
+  #\d+
+  
+logregex set to
+
+  \d+
 
 and having a commit message like
 
-  Issues #3, #4 and #5: Git Bugtraq Configuration options (see #12)
+  Issues #3, #4 and #5: Git Bugtraq Configuration options (see rule #12)
 
-logregex will pick "Issues #3, #4 and #5" and logregex1 will pick "3", "
-4" and "5".
+logfilterregex will pick "Issues #3, #4 and #5", loglinkregex will pick
+"#3", "#4", "#5" and logregex will pick "3", "4" and "5".
 
-Note: in Git-Config-like files, backslashes needs to be escaped (see
+Note: in Git-Config-like files, backslashes need to be escaped (see
 section 5).
+
 
 * bugtraq.enabled (optional)
 
@@ -118,8 +133,8 @@ An example content of .gitbugtraq (note, that '\' need to be escaped):
 
   [bugtraq]
     url = https://host/browse/SG-%BUGID%
+    loglinkregex = SG-\\d+
     logregex = \\d+
-    logregex1 = SG-(\\d+)
     
 Exactly the same lines could be added as an additional section to
 $GIT_DIR/config as well.
@@ -129,16 +144,20 @@ $GIT_DIR/config as well.
 --------------------
 
 * From messages like "Fix: #1" or "fixes:  #1, #2 and #3",
-  the "1", "2" and "3" should be extracted.
+  the "1", "2" and "3" should be extracted and the numbers including
+  hash-sign (#) should show up as links
 
-  logregex =  "(?i)fix(?:es)?\\: ((\\s*(,|and)?\\s*#\\d+)+)"
-  logregex1 = (\\d+) 
+  logfilterregex =  "(?i)fix(?:es)?\\: ((\\s*(,|and)?\\s*#\\d+)+)"
+  loglinkregex = #\\d+
+  logregex = \\d+
 
 * From messages like "Bug: #1" or "Bug IDs: #1; #2; #3" or
-  "Cases: #1, #2" the "1", "2" and "3" should be extracted.
+  "Cases: #1, #2" the "1", "2" and "3" should be extracted and only the
+  numbers itself should show up as links
 
-  logregex = "(?i)(?:Bug[zs]?\\s*IDs?\\s*|Cases?)[#:; ]+((\\d+[ ,:;#]*)+)"
-  logregex1 = \\d+
+  logfilterregex =
+    "(?i)(?:Bug[zs]?\\s*IDs?\\s*|Cases?)[#:; ]+((\\d+[ ,:;#]*)+)"
+  logregex = \\d+
   
 
 References

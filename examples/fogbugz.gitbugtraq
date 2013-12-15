@@ -3,5 +3,6 @@
 # (note that '\' need to be escaped).
 [bugtraq]
   url = https://host/?%BUGID%
-  logregex = "(?i)(?:Bug[zs]?\\s*IDs?\\s*|Cases?)[#:; ]+((\\d+[ ,:;#]*)+)"
-  logregex1 = \\d+
+  logfilterregex = "(?i)(?:Bug[zs]?\\s*IDs?\\s*|Cases?)[#:; ]+((\\d+[ ,:;#]*)+)"
+  loglinkregex = "#?\\d+"
+  logregex = \\d+

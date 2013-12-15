@@ -1,3 +1,5 @@
 [bugtraq]
   url = https://github.com/mstrap/bugtraq/issues/%BUGID%
-  logregex = "(?i)(?:(?:Issues?) ?[#]?(?:[ ,:;#]*(\\d+))*)"
+  logfilterregex = "(?i)(?:(?:Issues?) ?[#]?(?:[ ,:;#]*\\d+)*)"
+  loglinkregex = "#?\\d+"
+  logregex = \\d+

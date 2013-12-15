@@ -1,7 +1,7 @@
 # An example content of .gitbugtraq to put in the repository root directory.
 # It could instead be added as an additional section to $GIT_DIR/config.
 # (note that '\' need to be escaped).
-[bugtraq "fogbugz"]
+[bugtraq]
   url = https://host/?%BUGID%
-  logRegex = "(?i)(?:Bug[zs]?\\s*IDs?\\s*|Cases?)[#:; ]+((\\d+[ ,:;#]*)+)"
-  logRegex1 = \\d+
+  logregex = "(?i)(?:Bug[zs]?\\s*IDs?\\s*|Cases?)[#:; ]+((\\d+[ ,:;#]*)+)"
+  logregex1 = \\d+

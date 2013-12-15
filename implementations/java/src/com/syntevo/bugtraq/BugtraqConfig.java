@@ -50,7 +50,7 @@ public final class BugtraqConfig {
 
 	private static final String URL = "url";
 	private static final String ENABLED = "enabled";
-	private static final String LOG_REGEX = "logRegex";
+	private static final String LOG_REGEX = "logregex";
 
 	// Static =================================================================
 
@@ -59,21 +59,30 @@ public final class BugtraqConfig {
 		final Config baseConfig = getBaseConfig(repository);
 		final Set<String> allNames = new HashSet<String>();
 		final Config config = repository.getConfig();
-		allNames.addAll(config.getSubsections(BUGTRAQ));
-		if (baseConfig != null) {
-			allNames.addAll(baseConfig.getSubsections(BUGTRAQ));
+		if (getString(null, URL, config, baseConfig) != null) {
+			allNames.add(null);
+		}
+		else {
+			allNames.addAll(config.getSubsections(BUGTRAQ));
+			if (baseConfig != null) {
+				allNames.addAll(baseConfig.getSubsections(BUGTRAQ));
+			}
 		}
 
 		final List<BugtraqEntry> entries = new ArrayList<BugtraqEntry>();
 		for (String name : allNames) {
 			final String url = getString(name, URL, config, baseConfig);
+			if (url == null) {
+				continue;
+			}
+
 			final String enabled = getString(name, ENABLED, config, baseConfig);
 			if (enabled != null && !"true".equals(enabled)) {
 				continue;
 			}
 
 			final String logIdRegex = getString(name, LOG_REGEX, config, baseConfig);
-			if (url == null || logIdRegex == null) {
+			if (logIdRegex == null) {
 				return null;
 			}
 
@@ -174,7 +183,7 @@ public final class BugtraqConfig {
 	}
 
 	@Nullable
-	private static String getString(@NotNull String subsection, @NotNull String key, @NotNull Config config, @Nullable Config baseConfig) {
+	private static String getString(@Nullable String subsection, @NotNull String key, @NotNull Config config, @Nullable Config baseConfig) {
 		final String value = config.getString(BUGTRAQ, subsection, key);
 		if (value != null) {
 			return trimMaybeNull(value);
@@ -184,8 +193,8 @@ public final class BugtraqConfig {
 			return trimMaybeNull(baseConfig.getString(BUGTRAQ, subsection, key));
 		}
 
-		return value;
-	}
+			return value;
+		}
 
 	@Nullable
 	private static String trimMaybeNull(@Nullable String string) {

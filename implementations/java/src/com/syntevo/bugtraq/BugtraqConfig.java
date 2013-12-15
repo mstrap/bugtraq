@@ -45,6 +45,7 @@ public final class BugtraqConfig {
 	// Constants ==============================================================
 
 	private static final String DOT_GIT_BUGTRAQ = ".gitbugtraq";
+	private static final String DOT_TGITCONFIG = ".tgitconfig";
 
 	private static final String BUGTRAQ = "bugtraq";
 
@@ -58,7 +59,11 @@ public final class BugtraqConfig {
 
 	@Nullable
 	public static BugtraqConfig read(@NotNull Repository repository) throws IOException, ConfigInvalidException {
-		final Config baseConfig = getBaseConfig(repository);
+		Config baseConfig = getBaseConfig(repository, DOT_GIT_BUGTRAQ);
+		if (baseConfig == null) {
+			baseConfig = getBaseConfig(repository, DOT_TGITCONFIG);
+		}
+
 		final Set<String> allNames = new HashSet<String>();
 		final Config config = repository.getConfig();
 		if (getString(null, URL, config, baseConfig) != null) {
@@ -91,23 +96,31 @@ public final class BugtraqConfig {
 			String filterRegex = getString(name, LOG_FILTERREGEX, config, baseConfig);
 			final String linkRegex = getString(name, LOG_LINKREGEX, config, baseConfig);
 			if (filterRegex == null && linkRegex == null) {
-				// Backwards compatibility with specification version < 0.3
-				final List<String> logIdRegexs = new ArrayList<String>();
-				for (int index = 1; index < Integer.MAX_VALUE; index++) {
-					final String logIdRegexN = getString(name, LOG_REGEX + index, config, baseConfig);
-					if (logIdRegexN == null) {
-						break;
+				final String[] split = idRegex.split("\n", Integer.MAX_VALUE);
+				if (split.length == 2) {
+					// Compatibility with TortoiseGit
+					filterRegex = split[0];
+					idRegex = split[1];
+				}
+				else {
+					// Backwards compatibility with specification version < 0.3
+					final List<String> logIdRegexs = new ArrayList<String>();
+					for (int index = 1; index < Integer.MAX_VALUE; index++) {
+						final String logIdRegexN = getString(name, LOG_REGEX + index, config, baseConfig);
+						if (logIdRegexN == null) {
+							break;
+						}
+
+						logIdRegexs.add(logIdRegexN);
 					}
 
-					logIdRegexs.add(logIdRegexN);
-				}
-
-				if (logIdRegexs.size() > 1) {
-					throw new ConfigInvalidException("More than three " + LOG_REGEX + " entries found. This is not supported anymore since bugtraq version 0.3, use " + LOG_FILTERREGEX + " and " + LOG_LINKREGEX + " instead.");
-				}
-				else if (logIdRegexs.size() == 1) {
-					filterRegex = idRegex;
-					idRegex = logIdRegexs.get(0);
+					if (logIdRegexs.size() > 1) {
+						throw new ConfigInvalidException("More than three " + LOG_REGEX + " entries found. This is not supported anymore since bugtraq version 0.3, use " + LOG_FILTERREGEX + " and " + LOG_LINKREGEX + " instead.");
+					}
+					else if (logIdRegexs.size() == 1) {
+						filterRegex = idRegex;
+						idRegex = logIdRegexs.get(0);
+					}
 				}
 			}
 
@@ -142,14 +155,14 @@ public final class BugtraqConfig {
 	// Utils ==================================================================
 
 	@Nullable
-	private static Config getBaseConfig(Repository repository) throws IOException, ConfigInvalidException {
+	private static Config getBaseConfig(@NotNull Repository repository, @NotNull String configFileName) throws IOException, ConfigInvalidException {
 		final Config baseConfig;
 		if (repository.isBare()) {
 			// read bugtraq config directly from the repository
 			String content = null;
 			RevWalk rw = new RevWalk(repository);
 			TreeWalk tw = new TreeWalk(repository);
-			tw.setFilter(PathFilterGroup.createFromStrings(DOT_GIT_BUGTRAQ));
+			tw.setFilter(PathFilterGroup.createFromStrings(configFileName));
 			try {
 				ObjectId headId = repository.getRef(Constants.HEAD).getTarget().getObjectId();
 				RevCommit commit = rw.parseCommit(headId);
@@ -164,7 +177,8 @@ public final class BugtraqConfig {
 						break;
 					}
 				}
-			} finally {
+			}
+			finally {
 				rw.dispose();
 				tw.release();
 			}
@@ -182,7 +196,7 @@ public final class BugtraqConfig {
 		}
 		else {
 			// read bugtraq config from work tree
-			final File baseFile = new File(repository.getWorkTree(), DOT_GIT_BUGTRAQ);
+			final File baseFile = new File(repository.getWorkTree(), configFileName);
 			if (baseFile.isFile()) {
 				FileBasedConfig fileConfig = new FileBasedConfig(baseFile, repository.getFS());
 				fileConfig.load();

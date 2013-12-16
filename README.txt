@@ -80,6 +80,24 @@ Note: in Git-Config-like files, backslashes need to be escaped (see
 section 5).
 
 
+* bugtraq.loglinktext (optional)
+
+specifies a substitution text which will be used to display issue links
+extracted by logregex and loglinkregex, resp. loglinktext must contain
+%BUGID% which will be replaced by the concrete issue ID.
+
+Example: with logregex set to "#?(\d+)" and loglinktext set to
+"#%BUGID%", a commit message like
+
+  Issue #3, 4, 5: message
+  
+will be substituted to
+
+  Issue #3, #4, #5: message
+
+with "#3", "#4", "#5" being links to the corresponding issues.
+
+
 * bugtraq.enabled (optional)
 
 specifies whether this Bugtraq Configuration is enabled. It defaults to

@@ -54,6 +54,7 @@ public final class BugtraqConfig {
 	private static final String LOG_REGEX = "logregex";
 	private static final String LOG_FILTERREGEX = "logfilterregex";
 	private static final String LOG_LINKREGEX = "loglinkregex";
+	private static final String LOG_LINKTEXT = "loglinktext";
 
 	// Static =================================================================
 
@@ -124,7 +125,8 @@ public final class BugtraqConfig {
 				}
 			}
 
-			entries.add(new BugtraqEntry(url, idRegex, linkRegex, filterRegex));
+			final String linkText = getString(name, LOG_LINKTEXT, config, baseConfig);
+			entries.add(new BugtraqEntry(url, idRegex, linkRegex, filterRegex, linkText));
 		}
 
 		if (entries.isEmpty()) {

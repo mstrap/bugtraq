@@ -47,7 +47,7 @@ of the entire link). If loglinkregex is set, logregex must extract
 exactly one BUGID.
 
 If present, logfilterregex will be applied before logregex (or
-loglinkregex, resp.). Is must contain exactly one matching group which
+loglinkregex, resp.). It must contain exactly one matching group which
 extracts arbitrary parts of the commit message that will be used as
 input for logregex (or loglinkregex, resp.).
 

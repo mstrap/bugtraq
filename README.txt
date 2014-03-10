@@ -59,7 +59,7 @@ case-insensitive ('(?i)'). The overall extraction looks as follows:
 
 Example: with logfilterregex set to
 
-  [Ii]ssues?:?(\s*(,|and)?\s*#\d+)+
+  [Ii]ssues?:?((\s*(,|and)?\s*#\d+)+)
 
 loglinkregex set to
 

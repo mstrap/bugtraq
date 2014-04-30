@@ -166,7 +166,16 @@ public final class BugtraqConfig {
 			TreeWalk tw = new TreeWalk(repository);
 			tw.setFilter(PathFilterGroup.createFromStrings(configFileName));
 			try {
-				ObjectId headId = repository.getRef(Constants.HEAD).getTarget().getObjectId();
+				final Ref ref = repository.getRef(Constants.HEAD);
+				if (ref == null) {
+					return null;
+				}
+
+				ObjectId headId = ref.getTarget().getObjectId();
+				if (headId == null || ObjectId.zeroId().equals(headId)) {
+					return null;
+				}
+
 				RevCommit commit = rw.parseCommit(headId);
 				RevTree tree = commit.getTree();
 				tw.reset(tree);

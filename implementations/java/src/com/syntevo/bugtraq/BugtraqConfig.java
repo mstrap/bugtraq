@@ -66,7 +66,18 @@ public final class BugtraqConfig {
 		}
 
 		final Set<String> allNames = new HashSet<String>();
-		final Config config = repository.getConfig();
+		final Config config;
+		try {
+			config = repository.getConfig();
+		}
+		catch (RuntimeException ex) {
+			final Throwable cause = ex.getCause();
+			if (cause instanceof IOException) {
+				throw (IOException)cause;
+			}
+			throw ex;
+		}
+
 		if (getString(null, URL, config, baseConfig) != null) {
 			allNames.add(null);
 		}

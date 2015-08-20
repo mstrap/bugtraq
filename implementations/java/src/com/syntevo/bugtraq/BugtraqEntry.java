@@ -31,7 +31,7 @@ package com.syntevo.bugtraq;
 
 import org.jetbrains.annotations.*;
 
-final class BugtraqEntry {
+public final class BugtraqEntry {
 
 	// Fields =================================================================
 

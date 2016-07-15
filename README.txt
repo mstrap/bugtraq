@@ -1,6 +1,6 @@
 Git Bugtraq Configuration specification
 =======================================
-Version 0.3, 2013-11-25
+Version 0.4, 2016-07-15
 
 
 1. Introduction
@@ -103,6 +103,15 @@ with "#3", "#4", "#5" being links to the corresponding issues.
 specifies whether this Bugtraq Configuration is enabled. It defaults to
 'true'.
 
+* bugtraq.projects (optional)
+
+specifies a comma-separated list of JIRA 'projects' where for each
+project the bugtraq functionality will be applied. This works by
+looping over all specified projects and substituting %PROJECT% by
+the project key. Substitution of %PROJECT% will be performed for
+bugtraq.url, bugtraq.logregex, bugtraq.loglinkregex,
+bugtraq.logfilterregex and bugtraq.loglinktext. See examples.
+
 
 3. Multiple configurations
 --------------------------
@@ -176,8 +185,24 @@ $GIT_DIR/config as well.
   logfilterregex =
     "(?i)(?:Bug[zs]?\\s*IDs?\\s*|Cases?)[#:; ]+((\\d+[ ,:;#]*)+)"
   logregex = \\d+
-  
 
+* From a message like "PRJA-1: test, PRJB-2: tset" with following
+  configuration:
+
+  projects = PRJA, PRJB
+  url = https://server/browse/%PROJECT%-%BUGID%
+  loglinkregex = %PROJECT%-\\d+
+  logregex = \\d+
+  
+  Issue ID "1" will be extracted and linked to:
+  
+  https://server/browse/PRJA-1
+  
+  and issue ID "2" will be extracted and linked to:
+  
+  https://server/browse/PRJB-1
+
+  
 References
 ----------
 

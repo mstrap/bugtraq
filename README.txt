@@ -95,7 +95,7 @@ will be substituted to
 
   Issue #3, #4, #5: message
 
-with "#3", "#4", "#5" being links to the corresponding issues.
+with "##3", "#4", "#5" being links to the corresponding issues.
 
 
 * bugtraq.enabled (optional)

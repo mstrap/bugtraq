@@ -1,0 +1,11 @@
+# An example content of .gitbugtraq to put in the repository root directory.
+# It could instead be added as an additional section to $GIT_DIR/config.
+# (note that '\' need to be escaped).
+# This shows how to use detection for only specific projects in  JIRA
+[bugtraq "jira-mariadb"]
+
+; use only specific projects from https://jira.mariadb.org/secure/BrowseProjects.jspa?selectedCategory=all&selectedProjectType=all
+projects = CONC, CONJ, ODBC, MDEV
+url = https://jira.mariadb.org/browse/%PROJECT%-%BUGID%
+loglinkregex = %PROJECT%-\\d+
+logregex = \\d+

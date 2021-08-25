@@ -138,7 +138,12 @@ final class BugtraqParser {
 			return null;
 		}
 
-		return new Part(matcher.group(group), textStart, textEnd);
+		final String text = matcher.group(group);
+		if (text == null) {
+			return null;
+		}
+
+		return new Part(text, textStart, textEnd);
 	}
 
 	private static Pattern compilePatternSafe(String pattern) throws PatternSyntaxException {

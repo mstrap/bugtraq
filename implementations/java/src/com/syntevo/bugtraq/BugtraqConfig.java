@@ -29,28 +29,13 @@
  */
 package com.syntevo.bugtraq;
 
-import java.io.*;
-import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
 import java.util.*;
 
-import org.eclipse.jgit.errors.*;
-import org.eclipse.jgit.lib.*;
-import org.eclipse.jgit.revwalk.*;
-import org.eclipse.jgit.storage.file.*;
-import org.eclipse.jgit.treewalk.*;
-import org.eclipse.jgit.treewalk.filter.*;
 import org.jetbrains.annotations.*;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 public final class BugtraqConfig {
 
 	// Constants ==============================================================
-
-	private static final String DOT_GIT_BUGTRAQ = ".gitbugtraq";
-	private static final String DOT_TGITCONFIG = ".tgitconfig";
 
 	private static final String BUGTRAQ = "bugtraq";
 
@@ -65,30 +50,13 @@ public final class BugtraqConfig {
 	// Static =================================================================
 
 	@Nullable
-	public static BugtraqConfig read(@NotNull Repository repository) throws IOException, ConfigInvalidException {
-		Config baseConfig = getBaseConfig(repository, DOT_GIT_BUGTRAQ);
-		if (baseConfig == null) {
-			baseConfig = getBaseConfig(repository, DOT_TGITCONFIG);
-		}
-
-		final Set<String> allNames = new HashSet<String>();
-		final Config config;
-		try {
-			config = repository.getConfig();
-		}
-		catch (RuntimeException ex) {
-			final Throwable cause = ex.getCause();
-			if (cause instanceof IOException) {
-				throw (IOException)cause;
-			}
-			throw ex;
-		}
-
-		if (getString(null, URL, config, baseConfig) != null) {
+	public static BugtraqConfig read(@NotNull Config repoConfig, @Nullable Config baseConfig) throws BugtraqException {
+		final Set<String> allNames = new HashSet<>();
+		if (getString(null, URL, repoConfig, baseConfig) != null) {
 			allNames.add(null);
 		}
 		else {
-			allNames.addAll(config.getSubsections(BUGTRAQ));
+			allNames.addAll(repoConfig.getSubsections(BUGTRAQ));
 			if (baseConfig != null) {
 				allNames.addAll(baseConfig.getSubsections(BUGTRAQ));
 			}
@@ -96,23 +64,23 @@ public final class BugtraqConfig {
 
 		final List<BugtraqConfigEntry> entries = new ArrayList<>();
 		for (String name : allNames) {
-			final String url = getString(name, URL, config, baseConfig);
+			final String url = getString(name, URL, repoConfig, baseConfig);
 			if (url == null) {
 				continue;
 			}
 
-			final String enabled = getString(name, ENABLED, config, baseConfig);
+			final String enabled = getString(name, ENABLED, repoConfig, baseConfig);
 			if (enabled != null && !"true".equals(enabled)) {
 				continue;
 			}
 
-			String idRegex = getString(name, LOG_REGEX, config, baseConfig);
+			String idRegex = getString(name, LOG_REGEX, repoConfig, baseConfig);
 			if (idRegex == null) {
 				return null;
 			}
 
-			String filterRegex = getString(name, LOG_FILTERREGEX, config, baseConfig);
-			final String linkRegex = getString(name, LOG_LINKREGEX, config, baseConfig);
+			String filterRegex = getString(name, LOG_FILTERREGEX, repoConfig, baseConfig);
+			final String linkRegex = getString(name, LOG_LINKREGEX, repoConfig, baseConfig);
 			if (filterRegex == null && linkRegex == null) {
 				final String[] split = idRegex.split("\n", Integer.MAX_VALUE);
 				if (split.length == 2) {
@@ -122,9 +90,9 @@ public final class BugtraqConfig {
 				}
 				else {
 					// Backwards compatibility with specification version < 0.3
-					final List<String> logIdRegexs = new ArrayList<String>();
+					final List<String> logIdRegexs = new ArrayList<>();
 					for (int index = 1; index < Integer.MAX_VALUE; index++) {
-						final String logIdRegexN = getString(name, LOG_REGEX + index, config, baseConfig);
+						final String logIdRegexN = getString(name, LOG_REGEX + index, repoConfig, baseConfig);
 						if (logIdRegexN == null) {
 							break;
 						}
@@ -133,7 +101,7 @@ public final class BugtraqConfig {
 					}
 
 					if (logIdRegexs.size() > 1) {
-						throw new ConfigInvalidException("More than three " + LOG_REGEX + " entries found. This is not supported anymore since bugtraq version 0.3, use " + LOG_FILTERREGEX + " and " + LOG_LINKREGEX + " instead.");
+						throw new ConfigException("More than three " + LOG_REGEX + " entries found. This is not supported anymore since bugtraq version 0.3, use " + LOG_FILTERREGEX + " and " + LOG_LINKREGEX + " instead.");
 					}
 					else if (logIdRegexs.size() == 1) {
 						filterRegex = idRegex;
@@ -142,7 +110,7 @@ public final class BugtraqConfig {
 				}
 			}
 
-			final String projectsList = getString(name, PROJECTS, config, baseConfig);
+			final String projectsList = getString(name, PROJECTS, repoConfig, baseConfig);
 			final List<String> projects;
 			if (projectsList != null) {
 				projects = new ArrayList<>();
@@ -153,14 +121,14 @@ public final class BugtraqConfig {
 				}
 
 				if (projects.isEmpty()) {
-					throw new ConfigInvalidException("'" + name + ".projects' must specify at least one project or be not present at all.");
+					throw new ConfigException("'" + name + ".projects' must specify at least one project or be not present at all.");
 				}
 			}
 			else {
 				projects = null;
 			}
 
-			final String linkText = getString(name, LOG_LINKTEXT, config, baseConfig);
+			final String linkText = getString(name, LOG_LINKTEXT, repoConfig, baseConfig);
 			entries.add(new BugtraqConfigEntry(url, idRegex, linkRegex, filterRegex, linkText, projects));
 		}
 
@@ -192,80 +160,7 @@ public final class BugtraqConfig {
 	// Utils ==================================================================
 
 	@Nullable
-	private static Config getBaseConfig(@NotNull Repository repository, @NotNull String configFileName) throws IOException, ConfigInvalidException {
-		final Config baseConfig;
-		if (repository.isBare()) {
-			// read bugtraq config directly from the repository
-			String content = null;
-			RevWalk rw = new RevWalk(repository);
-			TreeWalk tw = new TreeWalk(repository);
-			tw.setFilter(PathFilterGroup.createFromStrings(configFileName));
-			try {
-				final Ref ref = repository.findRef(Constants.HEAD);
-				if (ref == null) {
-					return null;
-				}
-
-				ObjectId headId = ref.getTarget().getObjectId();
-				if (headId == null || ObjectId.zeroId().equals(headId)) {
-					return null;
-				}
-
-				RevCommit commit = rw.parseCommit(headId);
-				RevTree tree = commit.getTree();
-				tw.reset(tree);
-				while (tw.next()) {
-					ObjectId entid = tw.getObjectId(0);
-					FileMode entmode = tw.getFileMode(0);
-					if (FileMode.REGULAR_FILE == entmode) {
-						ObjectLoader ldr = repository.open(entid, Constants.OBJ_BLOB);
-						content = new String(ldr.getCachedBytes(), guessEncoding(commit));
-						break;
-					}
-				}
-			}
-			finally {
-				rw.dispose();
-				tw.close();
-			}
-
-			if (content == null) {
-				// config not found
-				baseConfig = null;
-			}
-			else {
-				// parse the config
-				Config config = new Config();
-				config.fromText(content);
-				baseConfig = config;
-			}
-		}
-		else {
-			// read bugtraq config from work tree
-			final File baseFile = new File(repository.getWorkTree(), configFileName);
-			if (baseFile.isFile()) {
-				FileBasedConfig fileConfig = new FileBasedConfig(baseFile, repository.getFS());
-				fileConfig.load();
-				baseConfig = fileConfig;
-			}
-			else {
-				baseConfig = null;
-			}
-		}
-		return baseConfig;
-	}
-
-	@NotNull
-	private static Charset guessEncoding(RevCommit commit) {
-		try {
-			return commit.getEncoding();
-		} catch (IllegalCharsetNameException | UnsupportedCharsetException e) {
-			return UTF_8;
-		}
-	}
-
-	@Nullable
-	private static String getString(@Nullable String subsection, @NotNull String key, @NotNull Config config, @Nullable Config baseConfig) {
+	private static String getString(@Nullable String subsection, @NotNull String key, @NotNull Config config, @Nullable Config baseConfig) throws ConfigException {
 		final String value = config.getString(BUGTRAQ, subsection, key);
 		if (value != null) {
 			return trimMaybeNull(value);
@@ -290,5 +185,23 @@ public final class BugtraqConfig {
 		}
 
 		return string;
+	}
+
+	// Inner Classes ==========================================================
+
+	public interface Config {
+		Collection<String> getSubsections(@NotNull String section) throws ConfigException;
+
+		String getString(@NotNull String section, @Nullable String subsection, @NotNull String key) throws ConfigException;
+	}
+
+	public static class ConfigException extends BugtraqException {
+		public ConfigException(String message) {
+			super(message);
+		}
+
+		public ConfigException(Throwable cause) {
+			super(cause);
+		}
 	}
 }

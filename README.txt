@@ -154,12 +154,14 @@ There are two places where the configuration options can be specified:
 * in $GIT_DIR/config
 
 Options specified in $GIT_DIR/config will override options from
-.gitbugtraq.
+.gitbugtraq. A .gitbugtraq file is processed as Git config file,
+i.e. the same rules for quoting and escaping apply.
 
-An example content of .gitbugtraq (note, that '\' need to be escaped):
+An example content of .gitbugtraq (note, that '\' need to be escaped
+and '"' is used to 'escape' the '#'):
 
   [bugtraq]
-    url = https://host/browse/SG-%BUGID%
+    url = "https://host/#root/browse/SG-%BUGID%"
     loglinkregex = SG-\\d+
     logregex = \\d+
     

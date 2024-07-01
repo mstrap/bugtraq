@@ -1,0 +1,5 @@
+[bugtraq "youtrack"]
+  projects = YOU
+  url = https://youtrack.com/issue/%PROJECT%-%BUGID%
+  loglinkregex = %PROJECT%-\\d+
+  logregex = \\d+

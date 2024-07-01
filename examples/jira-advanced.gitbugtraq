@@ -1,0 +1,8 @@
+# An example content of .gitbugtraq to put in the repository root directory.
+# It could instead be added as an additional section to $GIT_DIR/config.
+# (note that '\' need to be escaped).
+[bugtraq "advanced-jira"]
+  projects = JRA
+  url = https://jira.atlassian.com/browse/%PROJECT%-%BUGID%
+  loglinkregex = %PROJECT%-\\d+
+  logregex = (?<=-)\\d+

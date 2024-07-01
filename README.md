@@ -171,6 +171,23 @@ and issue ID `2` will be extracted and linked to:
 https://server/browse/PRJB-1
 ```
 
+### Example 4
+
+If your project keys contain digits themselves, like `PRJ1`, you will have to use _positive lookbehinds_ to ensure that `logregex` will extract exactly one BUGID. From a message like `PRJ1-123: test` with following configuration:
+
+```
+projects = PRJ1
+url = https://server/browse/%PROJECT%-%BUGID%
+loglinkregex = %PROJECT%-\\d+
+logregex = (?<=-)\\d+
+```
+
+Issue ID `123` will be extracted and linked to:
+
+```
+https://server/browse/PRJ1-123
+```
+
 ## References
 
 [^1]: [Subversion bugtraq properties](http://tortoisesvn.net/docs/release/TortoiseSVN_en/tsvn-dug-bugtracker.html)

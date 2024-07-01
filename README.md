@@ -129,6 +129,8 @@ Exactly the same lines could be added as an additional section to `$GIT_DIR/conf
 
 ## 5. logregex examples
 
+### Example 1
+
 From messages like `Fix: #1` or `fixes:  #1, #2 and #3`, the `1`, `2` and `3` should be extracted and the numbers including hash-sign (#) should show up as links:
 
 ```
@@ -137,12 +139,16 @@ loglinkregex = #\\d+
 logregex = \\d+
 ```
 
+### Example 2
+
 From messages like `Bug: #1` or `Bug IDs: #1; #2; #3` or `Cases: #1, #2` the `1`, `2` and `3` should be extracted and only the numbers itself should show up as links:
 
 ```
 logfilterregex = "(?i)(?:Bug[zs]?\\s*IDs?\\s*|Cases?)[#:; ]+((\\d+[ ,:;#]*)+)"
 logregex = \\d+
 ```
+
+### Example 3
 
 From a message like `PRJA-1: test, PRJB-2: tset` with following configuration:
 

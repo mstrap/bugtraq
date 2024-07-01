@@ -26,7 +26,7 @@ If present, `loglinkregex` will be applied before `logregex`. It must contain ex
 
 If present, `logfilterregex` will be applied before `logregex` (or `loglinkregex`, resp.). It must contain exactly one matching group which extracts arbitrary parts of the commit message that will be used as input for `logregex` (or `loglinkregex`, resp.).
 
-Every of these regular expressions may contain additional non-matching groups (`(?:`) and matches case-sensitive unless explicitly set to case-insensitive (`(?i)`). The overall extraction looks as follows:
+Every of these regular expressions may contain additional non-capturing groups (`(?:)` and matches case-sensitive unless explicitly set to case-insensitive (`(?i)`). The overall extraction looks as follows:
 
 ```
 commit message -> logfilterregex -> loglinkregex -> logregex -> BUGID

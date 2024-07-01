@@ -168,7 +168,7 @@ https://server/browse/PRJA-1
 and issue ID `2` will be extracted and linked to:
 
 ```
-https://server/browse/PRJB-1
+https://server/browse/PRJB-2
 ```
 
 ### Example 4

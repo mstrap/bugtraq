@@ -3,7 +3,7 @@
 # (note that '\' need to be escaped).
 [bugtraq]
   url = https://github.com/username/project/issues/%BUGID%
-  #detects all issues in commit messages like "#5"
-  loglinkregex = "#\\d+"
+  #detects all issues in commit messages like "Issue #5:" 
+  logfilterregex = "(?i)(?:(?:Issues?) ?[#]?(?:[ ,:;#]*\\d+)*)"
+  loglinkregex = "#?\\d+"
   logregex = \\d+
-

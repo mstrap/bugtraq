@@ -1,0 +1,8 @@
+#Sample Polarion URL: https://testdrive.polarion.com/polarion/#/project/LT.Connect/workitem?id=LTC-105
+
+[bugtraq "polarion"]
+  projects = LTC
+  url = "https://testdrive.polarion.com/polarion/#/project/<projectname>/workitem?id=%PROJECT%-%BUGID%"
+  
+  loglinkregex = %PROJECT%-\\d+
+  logregex = \\d+

@@ -1,0 +1,10 @@
+# An example content of .gitbugtraq to put in the repository root directory.
+# It could instead be added as an additional section to $GIT_DIR/config.
+# (note that '\' need to be escaped).
+
+#Sample repository: https://gitlab.com/daniels_199/gitbugtraqdemo/
+
+[bugtraq]
+  url = https://gitlab.com/username/project/-/issues/%BUGID%
+  loglinkregex = "#\\d+"
+  logregex = \\d+
